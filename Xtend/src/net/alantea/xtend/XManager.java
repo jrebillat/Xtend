@@ -46,6 +46,8 @@ public class XManager
   
   /**
    * Load a container extension, instantiate all implementations and notify the container.
+   *
+   * @param <T> the generic type
    * @param baseClass for extension to find
    * @param forcedReload to force for reflective research even if a target is found in cache
    * @return the instantiated extension
@@ -97,6 +99,8 @@ public class XManager
 
   /**
    * Load an abstract extension, i.e. one implementation of it (the derived class)
+   *
+   * @param <T> the generic type
    * @param baseClass for extension to find
    * @param forcedReload to force for reflective research even if a target is found in cache
    * @return the instantiated extension
@@ -120,7 +124,9 @@ public class XManager
   }
 
   /**
-  * Load an abstract extension, i.e. all implementations of it (derived classes)
+   * Load an abstract extension, i.e. all implementations of it (derived classes)
+   *
+   * @param <T> the generic type
    * @param baseClass for extension to find
    * @param forcedReload to force for reflective research even if a target is found in cache
    * @return the instantiated extension
