@@ -170,81 +170,86 @@ public class XManager
   }
 
   /**
-   * Load extensions.
+   * Gets the extension class for a base class.
    *
-   * @param <T> the generic type
    * @param baseClass the base class
-   * @param acceptMultiple the accept multiple
-   * @param forcedReload the forced reload
-   * @return the list
+   * @return the extension class
    * @throws Xception the xception
    */
+  public static Class<?> getExtensionClass(Class<?> baseClass) throws Xception
+  {
+     List<Class<?>> classes = loadExtensionClasses(baseClass,false, false);
+     return classes.get(0);
+  }
+
+  private static List<Class<?>> loadExtensionClasses(Class<?> baseClass,
+      boolean acceptMultiple, boolean forcedReload) throws Xception
+  {
+     List<Class<?>> classes = new ArrayList<Class<?>>();
+     if (!forcedReload)
+     {
+       for (Class<?> ext : extensions)
+       {
+         if ( baseClass.isAssignableFrom(ext) )
+         {
+           classes.add(ext);
+         }
+       }
+     }
+
+     if ((classes.isEmpty()) || forcedReload)
+     {
+        // list all classes derived from the base class.
+        List<String> set;
+        if (baseClass.isInterface())
+          {
+              set = new FastClasspathScanner().scan().getNamesOfClassesImplementing(baseClass);
+          }
+        else
+        {
+             set = new FastClasspathScanner().scan().getNamesOfSubclassesOf(baseClass);
+        }
+
+        for (String o : set)
+        {
+           Class<?> cl;
+           try
+           {
+              cl = ClassLoader.getSystemClassLoader().loadClass(o);
+           }
+           catch (ClassNotFoundException e)
+           {
+              throw new Xception(Why.BAD_EXTENSION);
+           }
+           if (!Modifier.isAbstract(cl.getModifiers()))
+           {
+              classes.add(cl);
+           }
+        }
+     }
+     if (classes.isEmpty())
+     {
+        throw new Xception(Why.NO_EXTENSION);
+     }
+
+     if ((!acceptMultiple) && (classes.size() > 1))
+     {
+        throw new Xception(Why.MULTIPLE_EXTENSION);
+     }
+     
+     return classes;
+  }
+
   private static <T> List<T> loadExtensions(Class<?> baseClass,
       boolean acceptMultiple, boolean forcedReload) throws Xception
   {
-    ArrayList<T> ret = new ArrayList<T>();
-    
-    List<Class<?>> classes = new ArrayList<Class<?>>();
-    if (!forcedReload)
-    {
-      for (Class<?> ext : extensions)
-      {
-        if ( baseClass.isAssignableFrom(ext) )
-        {
-          classes.add(ext);
-        }
-      }
-    }
-
-    if ((classes.isEmpty()) || forcedReload)
-    {
-       // list all classes derived from the base class.
-    	List<String> set;
-    	if (baseClass.isInterface())
-        {
-            set = new FastClasspathScanner().scan().getNamesOfClassesImplementing(baseClass);
-        }
-    	else
-    	{
-           set = new FastClasspathScanner().scan().getNamesOfSubclassesOf(baseClass);
-    	}
-       if (set.isEmpty())
-       {
-         throw new Xception(Why.NO_EXTENSION);
-       }
-       for (String clName : set)
-       {
-         try {
-			classes.add(ClassLoader.getSystemClassLoader().loadClass(clName));
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-       }
-    }
-
-    if (!acceptMultiple)
-    {
-      int num = 0;
-      for (Class<?> obj : classes)
-      {
-        if (!Modifier.isAbstract(((Class<?>) obj).getModifiers()))
-        {
-          num++;
-          if (num > 1)
-          {
-            throw new Xception(Why.MULTIPLE_EXTENSION);
-          }
-        }
-      }
-
-    }
+     ArrayList<T> ret = new ArrayList<T>();
+     
+     List<Class<?>> classes = loadExtensionClasses( baseClass, acceptMultiple, forcedReload);
 
     // load instances.
     for (Class<?> obj : classes)
     {
-      if (!Modifier.isAbstract(((Class<?>) obj).getModifiers()))
-      {
         @SuppressWarnings("unchecked")
         Class<? extends T> cl = (Class<? extends T>) obj;
         try
@@ -256,44 +261,13 @@ public class XManager
           @SuppressWarnings("unchecked")
           T t = (T) constructor.newInstance();
           ret.add(t);
-          try
-          {
-             XMessages.addAssociatedBundle(t);
-          }
-          catch ( Xception e)
-          {
-              if (e.getWhy() != Why.NO_BUNDLE)
-              {
-            	  throw e;
-              }
-          }
+          XMessages.addAssociatedBundle(t);
         }
-        catch (NoSuchMethodException e)
+        catch (NoSuchMethodException | SecurityException | InstantiationException 
+           | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
         {
           throw new Xception(Why.BAD_CONSTRUCTOR);
         }
-        catch (SecurityException e)
-        {
-          throw new Xception(Why.BAD_CONSTRUCTOR);
-        }
-        catch (InstantiationException e)
-        {
-          throw new Xception(Why.BAD_CONSTRUCTOR);
-        }
-        catch (IllegalAccessException e)
-        {
-          e.printStackTrace();
-          throw new Xception(Why.BAD_CONSTRUCTOR);
-        }
-        catch (IllegalArgumentException e)
-        {
-          throw new Xception(Why.BAD_CONSTRUCTOR);
-        }
-        catch (InvocationTargetException e)
-        {
-          throw new Xception(Why.BAD_CONSTRUCTOR);
-        }
-      }
     }
     return ret;
   }

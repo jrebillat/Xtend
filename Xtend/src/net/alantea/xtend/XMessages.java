@@ -61,7 +61,7 @@ public class XMessages
     }
     catch (MissingResourceException e)
     {
-        throw new Xception(Why.NO_BUNDLE, "Missing resource", e);
+        return false;
     }
   }
 
