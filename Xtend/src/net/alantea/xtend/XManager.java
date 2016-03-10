@@ -5,11 +5,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
+import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 import net.alantea.xtend.Xception.Why;
-
-import org.reflections.Reflections;
 
 /**
  * Class to manage extensions. It has the ability to manage :
@@ -80,12 +78,45 @@ public class XManager
   }
   
   /**
+   * Load a list of container extensions, instantiate all implementations and notify the container.
+   *
+   * @param <T> the generic type
+   * @param baseClass for extension to find
+   * @param acceptMultiple the accept multiple
+   * @param forcedReload to force for reflective research even if a target is found in cache
+   * @return the instantiated extension
+   * @throws Xception when raised
+   */
+  public static <T> List<T> loadContainerExtensions(Class<?> baseClass, boolean acceptMultiple,
+		  boolean forcedReload) throws Xception
+  {
+    // Search for the extensions
+    List<T> list = loadExtensions(baseClass, acceptMultiple, forcedReload);
+    if (list.isEmpty())
+    {
+      throw new Xception(Why.NO_EXTENSION);
+    }
+    
+    for (T ext : list)
+    {
+        if (! (ext instanceof IExtension))
+        {
+          throw new Xception(Why.BAD_EXTENSION);
+        }
+        // load implementations
+        loadImplementations((IExtension)ext, forcedReload);	
+    }
+    
+    return list;
+  }
+  
+  /**
    * Given an object implementing IExtension, instantiate all implementations and notify the object.
    * @param extend extension for which to instantiate implementations
    * @param forcedReload to force for reflective research even if a target is found in cache
    * @throws Xception when raised
    */
-  public static void loadImplementations(IExtension extend, boolean forcedReload) throws Xception
+  private static void loadImplementations(IExtension extend, boolean forcedReload) throws Xception
   {
     // instantiate implementations
     List<Object> impls = loadExtensions(extend.getExtendedInterface(), true, forcedReload);
@@ -168,15 +199,27 @@ public class XManager
     if ((classes.isEmpty()) || forcedReload)
     {
        // list all classes derived from the base class.
-       Reflections reflect = new Reflections(baseClass.getClassLoader());
-       Set<?> set = reflect.getSubTypesOf(baseClass);
+    	List<String> set;
+    	if (baseClass.isInterface())
+        {
+            set = new FastClasspathScanner().scan().getNamesOfClassesImplementing(baseClass);
+        }
+    	else
+    	{
+           set = new FastClasspathScanner().scan().getNamesOfSubclassesOf(baseClass);
+    	}
        if (set.isEmpty())
        {
          throw new Xception(Why.NO_EXTENSION);
        }
-       for (Object o : set)
+       for (String clName : set)
        {
-         classes.add((Class<?>)o);
+         try {
+			classes.add(ClassLoader.getSystemClassLoader().loadClass(clName));
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
        }
     }
 
