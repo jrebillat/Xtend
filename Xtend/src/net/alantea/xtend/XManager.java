@@ -176,13 +176,15 @@ public class XManager
    * @return the extension class
    * @throws Xception the xception
    */
-  public static Class<?> getExtensionClass(Class<?> baseClass) throws Xception
+  @SuppressWarnings("unchecked")
+public static <T> Class<T> getExtensionClass(Class<T> baseClass) throws Xception
   {
      List<Class<?>> classes = loadExtensionClasses(baseClass,false, false);
-     return classes.get(0);
+     return (Class<T>) classes.get(0);
   }
 
-  private static List<Class<?>> loadExtensionClasses(Class<?> baseClass,
+  @SuppressWarnings("unchecked")
+private static <T> List<Class<?>> loadExtensionClasses(Class<T> baseClass,
       boolean acceptMultiple, boolean forcedReload) throws Xception
   {
      List<Class<?>> classes = new ArrayList<Class<?>>();
@@ -192,7 +194,7 @@ public class XManager
        {
          if ( baseClass.isAssignableFrom(ext) )
          {
-           classes.add(ext);
+           classes.add((Class<T>) ext);
          }
        }
      }
@@ -212,10 +214,10 @@ public class XManager
 
         for (String o : set)
         {
-           Class<?> cl;
+           Class<T> cl;
            try
            {
-              cl = ClassLoader.getSystemClassLoader().loadClass(o);
+              cl = (Class<T>) ClassLoader.getSystemClassLoader().loadClass(o);
            }
            catch (ClassNotFoundException e)
            {
