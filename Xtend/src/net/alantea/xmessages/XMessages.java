@@ -1,4 +1,4 @@
-package net.alantea.xtend;
+package net.alantea.xmessages;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,7 +11,7 @@ import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
 import java.util.TreeMap;
 
-import net.alantea.xtend.Xception.Why;
+import net.alantea.xtend.Xception;
 
 /**
  * Class to manage messages from extensions.

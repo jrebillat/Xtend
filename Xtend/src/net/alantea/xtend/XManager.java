@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
+import net.alantea.xmessages.XMessages;
 import net.alantea.xtend.Xception.Why;
 
 /**
