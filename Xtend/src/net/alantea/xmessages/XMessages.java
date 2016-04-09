@@ -105,6 +105,10 @@ public class XMessages
       throws MissingResourceException
   {
     String name = object.getClass().getName();
+    if (object instanceof String)
+    {
+       name = (String) object;
+    }
     ResourceBundle bundle = null;
 
     bundle = bundles.get(new XMessagesKey(name, -1));

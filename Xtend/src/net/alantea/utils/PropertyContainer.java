@@ -4,8 +4,8 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
-import javafx.beans.value.ObservableValue;
 
 /**
  * The Class PropertyContainer. This is a generic type to hold properties marked with the @Property annotation.
@@ -60,6 +60,7 @@ public class PropertyContainer
                   {
                      name = field.getName();
                   }
+                  System.out.println("found " + name);
                   if (o instanceof Property)
                   {
                      properties.put(name, (Property<?>) o);
@@ -115,7 +116,7 @@ public class PropertyContainer
       {
          return false;
       }
-      prop.bind((ObservableValue<? extends T>) value);
+      prop.bind((Property<T>) value);
       return true;
    }
 
@@ -150,6 +151,7 @@ public class PropertyContainer
     */
    private boolean setOne(String propertyName, Object value)
    {
+      System.out.println("set " + propertyName + " as " + value);
       Object object = properties.get(propertyName);
       if (object == null)
       {
@@ -231,5 +233,11 @@ public class PropertyContainer
          return (Property<T>) object;
       }
       return null;
+   }
+   
+   protected void resetProperties()
+   {
+      properties = null;
+      initialize();
    }
 }
