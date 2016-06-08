@@ -52,10 +52,10 @@ public class XManager
    * @return the instantiated extension
    * @throws Xception when raised
    */
-  public static <T> T loadContainerExtension(Class<?> baseClass, boolean forcedReload) throws Xception
+  public static <T> T loadContainerExtension(Class<?> baseClass, boolean forcedReload, Object... args) throws Xception
   {
     // Search for the extension itself
-    List<T> list = loadExtensions(baseClass, false, forcedReload);
+    List<T> list = loadExtensions(baseClass, false, forcedReload, args);
     if (list.isEmpty())
     {
       throw new Xception(Why.NO_EXTENSION);
@@ -89,10 +89,10 @@ public class XManager
    * @throws Xception when raised
    */
   public static <T> List<T> loadContainerExtensions(Class<?> baseClass, boolean acceptMultiple,
-		  boolean forcedReload) throws Xception
+		  boolean forcedReload, Object... args) throws Xception
   {
     // Search for the extensions
-    List<T> list = loadExtensions(baseClass, acceptMultiple, forcedReload);
+    List<T> list = loadExtensions(baseClass, acceptMultiple, forcedReload, args);
     if (list.isEmpty())
     {
       throw new Xception(Why.NO_EXTENSION);
@@ -117,10 +117,10 @@ public class XManager
    * @param forcedReload to force for reflective research even if a target is found in cache
    * @throws Xception when raised
    */
-  private static void loadImplementations(IExtension extend, boolean forcedReload) throws Xception
+  private static void loadImplementations(IExtension extend, boolean forcedReload, Object... args) throws Xception
   {
     // instantiate implementations
-    List<Object> impls = loadExtensions(extend.getExtendedInterface(), true, forcedReload);
+    List<Object> impls = loadExtensions(extend.getExtendedInterface(), true, forcedReload, args);
     
     // notify extension
     for (Object impl : impls)
@@ -138,10 +138,10 @@ public class XManager
    * @return the instantiated extension
    * @throws Xception when raised
    */
-  public static <T> T loadAbstractExtension(Class<?> baseClass, boolean forcedReload) throws Xception
+  public static <T> T loadAbstractExtension(Class<?> baseClass, boolean forcedReload, Object... args) throws Xception
   {
     // get implementations
-    List<T> list = loadExtensions(baseClass, false, forcedReload);
+    List<T> list = loadExtensions(baseClass, false, forcedReload, args);
     
     // verify unicity
     if (list.isEmpty())
@@ -164,10 +164,10 @@ public class XManager
    * @return the instantiated extension
    * @throws Xception when raised
    */
-  public static <T> List<T> loadAbstractExtensions(Class<?> baseClass, boolean forcedReload)
+  public static <T> List<T> loadAbstractExtensions(Class<?> baseClass, boolean forcedReload, Object... args)
       throws Xception
   {
-    return loadExtensions(baseClass, true, forcedReload);
+    return loadExtensions(baseClass, true, forcedReload, args);
   }
 
   /**
@@ -244,7 +244,7 @@ private static <T> List<Class<?>> loadExtensionClasses(Class<T> baseClass,
   }
 
   private static <T> List<T> loadExtensions(Class<?> baseClass,
-      boolean acceptMultiple, boolean forcedReload) throws Xception
+      boolean acceptMultiple, boolean forcedReload, Object... args) throws Xception
   {
      ArrayList<T> ret = new ArrayList<T>();
      
@@ -258,15 +258,32 @@ private static <T> List<Class<?>> loadExtensionClasses(Class<T> baseClass,
         try
         {
           // search constructor
-          Constructor<?> constructor = (Constructor<?>) cl
-              .getDeclaredConstructor();
+           Constructor<?> constructor = null;
+           Constructor<?>[] cons = cl.getConstructors();
+           for (Constructor<?> con : cons)
+           {
+              Class<?>[] parms = con.getParameterTypes();
+              if (parms.length == args.length)
+              {
+                 boolean ok = true;
+                 for (int i = 0; i < parms.length; i++)
+                 {
+                    ok &= ((args[i] == null) || (parms[i].isAssignableFrom(args[i].getClass())));
+                 }
+                 if (ok)
+                 {
+                    constructor = con;
+                 }
+              }
+           }
+           
           // create instance
           @SuppressWarnings("unchecked")
           T t = (T) constructor.newInstance();
           ret.add(t);
           XMessages.addAssociatedBundle(t);
         }
-        catch (NoSuchMethodException | SecurityException | InstantiationException 
+        catch ( SecurityException | InstantiationException 
            | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
         {
           throw new Xception(Why.BAD_CONSTRUCTOR);
