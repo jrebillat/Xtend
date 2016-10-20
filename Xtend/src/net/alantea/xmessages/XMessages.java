@@ -124,6 +124,44 @@ public class XMessages
   }
 
   /**
+   * Manage bundle.
+   *
+   * @param name the bundle name
+   * @return the resource bundle
+   */
+  public static boolean addBundle(String name)
+  {
+     return addBundle(name, 0);
+  }
+
+  /**
+   * Manage bundle.
+   *
+   * @param name the bundle name
+   * @param level the association level (the lowest priority is the higher value).
+   * @return the resource bundle
+   */
+  public static boolean addBundle(String name, int level)
+  {
+     try
+     {
+        ResourceBundle bundle = null;
+
+        bundle = bundles.get(new XMessagesKey(name, -1));
+        if (bundle == null)
+        {
+          bundle = ResourceBundle.getBundle(name, locale, new UTF8Control());
+          bundles.put(new XMessagesKey(name, level), bundle);
+        }
+        return (bundle != null);
+     }
+     catch (MissingResourceException e)
+     {
+         return false;
+     }
+  }
+
+  /**
    * Get a value as int from its key.
    * 
    * @param key to search
@@ -168,9 +206,26 @@ public class XMessages
   }
 
   /**
+   * Get a message from its key or return null.
+   *
+   * @param key to search
+   * @param args the args
+   * @return the message value or the key if nothing is found
+   */
+  public static String getOrNull(String key, String... args)
+  {
+     String ret = get(key, args);
+     if (ret.equals(key))
+     {
+        ret = null;
+     }
+     return ret;
+  }
+
+  /**
    * Get a message from its key.
    *
-   * @param key          to search
+   * @param key to search
    * @param args the args
    * @return the message value or the key if nothing is found
    */
@@ -181,20 +236,20 @@ public class XMessages
     // search in registered bundles
     if ((ret == null) || (ret.equals(key)))
     {
-      try
-      {
         for (ResourceBundle bundle : bundles.values())
         {
           if ((ret == null) || (ret.equals(key)))
           {
-            ret = bundle.getString(key);
+             try
+             {
+               ret = bundle.getString(key);
+             }
+             catch (MissingResourceException e)
+             {
+               ret = key;
+             }
           }
         }
-      }
-      catch (MissingResourceException e)
-      {
-        ret = key;
-      }
     }
 
     // replace arguments
