@@ -156,6 +156,30 @@ public class XManager
   }
 
   /**
+   * Load an abstract extension, i.e. one specific implementation of it (a derived class)
+   *
+   * @param <T> the generic type
+   * @param baseClass for extension to find
+   * @param forcedReload to force for reflective research even if a target is found in cache
+   * @return the instantiated extension
+   * @throws Xception when raised
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> T loadSpecificAbstractExtension(Class<?> implementationClass, boolean forcedReload, Object... args) throws Xception
+  {
+    // get implementations
+    try
+    {
+       return (T) loadSpecificExtension(implementationClass, args);
+    }
+    catch ( SecurityException | InstantiationException 
+          | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+       {
+         throw new Xception(Why.NO_EXTENSION);
+       }
+  }
+
+  /**
    * Load an abstract extension, i.e. all implementations of it (derived classes)
    *
    * @param <T> the generic type
@@ -257,31 +281,10 @@ private static <T> List<Class<?>> loadExtensionClasses(Class<T> baseClass,
         Class<? extends T> cl = (Class<? extends T>) obj;
         try
         {
-          // search constructor
-           Constructor<?> constructor = null;
-           Constructor<?>[] cons = cl.getConstructors();
-           for (Constructor<?> con : cons)
-           {
-              Class<?>[] parms = con.getParameterTypes();
-              if (parms.length == args.length)
-              {
-                 boolean ok = true;
-                 for (int i = 0; i < parms.length; i++)
-                 {
-                    ok &= ((args[i] == null) || (parms[i].isAssignableFrom(args[i].getClass())));
-                 }
-                 if (ok)
-                 {
-                    constructor = con;
-                 }
-              }
-           }
-           
           // create instance
-          @SuppressWarnings("unchecked")
-          T t = (T) constructor.newInstance();
-          ret.add(t);
+          T t = loadSpecificExtension(cl, args);
           XMessages.addAssociatedBundle(t);
+          ret.add(t);
         }
         catch ( SecurityException | InstantiationException 
            | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
@@ -291,4 +294,47 @@ private static <T> List<Class<?>> loadExtensionClasses(Class<T> baseClass,
     }
     return ret;
   }
+  
+  /**
+   * Load specific extension.
+   *
+   * @param <T> the generic type
+   * @param cl the cl
+   * @param args the args
+   * @return the extension instance
+   * @throws InstantiationException the instantiation exception
+   * @throws IllegalAccessException the illegal access exception
+   * @throws IllegalArgumentException the illegal argument exception
+   * @throws InvocationTargetException the invocation target exception
+   * @throws Xception the xception
+   */
+  private static <T> T loadSpecificExtension(Class<? extends T> cl, Object... args) 
+        throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, Xception
+  {
+     // search constructor
+      Constructor<?> constructor = null;
+      Constructor<?>[] cons = cl.getConstructors();
+      for (Constructor<?> con : cons)
+      {
+         Class<?>[] parms = con.getParameterTypes();
+         if (parms.length == args.length)
+         {
+            boolean ok = true;
+            for (int i = 0; i < parms.length; i++)
+            {
+               ok &= ((args[i] == null) || (parms[i].isAssignableFrom(args[i].getClass())));
+            }
+            if (ok)
+            {
+               constructor = con;
+            }
+         }
+      }
+      
+     // create instance
+     @SuppressWarnings("unchecked")
+     T t = (T) constructor.newInstance();
+     XMessages.addAssociatedBundle(t);
+     return t;
+   }
 }
