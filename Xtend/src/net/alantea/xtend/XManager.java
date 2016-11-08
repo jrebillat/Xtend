@@ -289,6 +289,7 @@ private static <T> List<Class<?>> loadExtensionClasses(Class<T> baseClass,
         catch ( SecurityException | InstantiationException 
            | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
         {
+           System.out.println(e);
           throw new Xception(Why.BAD_CONSTRUCTOR);
         }
     }
