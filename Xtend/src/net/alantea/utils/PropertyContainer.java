@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 
 /**
