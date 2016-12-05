@@ -1,10 +1,29 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>net.alantea</groupId>
-	<artifactId>xtend</artifactId>
-	<version>0.0.5-SNAPSHOT</version>
-	<name>Xtend</name>
-	<description>EXtension mechanism</description>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>net.alantea</groupId>
+  <artifactId>xtend</artifactId>
+  <version>0.0.7-SNAPSHOT</version>
+  <name>Xtend</name>
+  <packaging>jar</packaging>
+  <description>EXtension mechanism</description>
+  <licenses>
+    <license>
+    <name>GNU Lesser General Public License (LGPL)</name>
+    <url>http://www.gnu.org/licenses/lgpl.txt</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>jrebillat</id>
+      <name>Jean Rébillat</name>
+      <email>jean.rebillat@free.fr</email>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Paris</timezone>
+    </developer>
+  </developers>
   <distributionManagement>
     <snapshotRepository>
       <id>ossrh</id>
@@ -19,8 +38,32 @@
     <sourceDirectory>src</sourceDirectory>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5.1</version>
+        <version>3.6.0</version>
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
@@ -29,7 +72,7 @@
 	  <plugin>
 		<groupId>org.apache.maven.plugins</groupId>
 		<artifactId>maven-gpg-plugin</artifactId>
-		<version>1.5</version>
+		<version>1.6</version>
 		<executions>
 			<execution>
 				<id>sign-artifacts</id>
@@ -51,9 +94,19 @@
            <autoReleaseAfterClose>true</autoReleaseAfterClose>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.5.3</version>
+        <configuration>
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+          <useReleaseProfile>false</useReleaseProfile>
+          <releaseProfiles>release</releaseProfiles>
+          <goals>deploy</goals>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
-
 	<dependencies>
 		<dependency>
 			<groupId>io.github.lukehutch</groupId>
