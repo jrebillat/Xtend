@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.alantea</groupId>
   <artifactId>xtend</artifactId>
-  <version>0.0.7-SNAPSHOT</version>
+  <version>0.0.7</version>
   <name>Xtend</name>
   <packaging>jar</packaging>
   <description>EXtension mechanism</description>
@@ -124,6 +124,6 @@
 		<connection>scm:git:git@github.com:jrebillat/Xtend.git</connection>
 		<url>scm:git:git@github.com:jrebillat/Xtend.git</url>
 		<developerConnection>scm:git:git@github.com:jrebillat/Xtend.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>xtend-0.0.7</tag>
 	</scm>
 </project>
