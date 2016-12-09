@@ -19,7 +19,7 @@ import net.alantea.xtend.Xception;
  * @author Alantea
  * 
  */
-public class XMessages
+public final class XMessages
 {
   
   /** The bundles. */

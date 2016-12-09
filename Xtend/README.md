@@ -30,7 +30,28 @@ OK, but, how to tell the application which value to return ? The answer is to le
 ## Bonus
 The start of a javascript engine encapsulation is also available in XEngine.
 
-## XMessage usage
+## XMessages usage
+The Xmessages is an utility class, with only static methods. This internationalization system is meant to be application-wide.
+
+### Adding bundles
+As said before, bundles may be added from their path, or from a class instance. The class must have the same name and the same package as the properties files.
+* To simply add a bundle, use `boolean addBundle(String path)`. The bundle located at the given path will be loaded with the correct international version. Concerning levels his bundle will be considered as level 0. The method will return *true* if the bundle has been correctly loaded.
+* To add a bundle at a given level, use `addBundle(String path, int level)`. The bundle located at the given path will be loaded with the correct international version, at the given level.The method will return *true* if the bundle has been correctly loaded.
+* To load a bundle associated with an instance from a class, use `boolean addAssociatedBundle(Object associated)`. The bundle located near the class path of the associated object will be loaded with the correct international version. Concerning levels his bundle will be considered as level 0. The method will return *true* if the bundle has been correctly loaded.
+* To load a bundle associated with an instance from a class at a given level, use `boolean addAssociatedBundle(Object associated, int level)`. The bundle located near the class path of the associated object will be loaded with the correct international version, at the given level. The method will return *true* if the bundle has been correctly loaded.
+
+### Getting simple values
+The base method to get values is `String get(String key, String... parameters)`, that may be most of the time used as `String get(String key)` if you do not need to get a value including parameter strings. We will discuss later about parameters. The returned value is the found value, if any, or the key itself if no corresponding value has been found.
+There are a few helpers, to get an integer : `int getInteger(String key)` that returns 0 if no value has been found, to get a double : `double getDouble(String key)` that returns 0.0 if no value has been found, and `String getOrNull(String key)` that try to find a value and returns *null* if no value has been found.
+
+### Using parameters
+To get a parametrized value, use the `String get(String key, String... parameters)` with parameters. But for parameters to be used, the value string must provide slots to insert the parameter values in it. This is done using the `[n]` syntax, with *n* being an integer value. The matching parameter (starting at 1 being the first parameter) is in included to replace the [n] part of the string.
+As an example, with the following key defined in a bundle :
+`Error.display.message = An error of type [1] occurred with messages '[2]'.` (and the same, localized, in other languages), you may call (with an error named *error* being thrown) the method like `get("", error.class.getName(), error.getLocalizedMessage();` to get a good-looking error message string.
+Note that the same parameter may be inserted more than once in the value string (or not inserted at all). If there are too much arguments, the last ones will be ignored. If there are nor enough, the string `null` will replace the corresponding [n] string (currently not internationalized).
+
+### Getting the bundles
+Sometimes, you will not want to use overridden values, but the one from a specific bundle. Thus to help you, you can get a bundle associated to an object using the `ResourceBundle getBundle(Object associated)`. Be careful, as this will create the corresponding bundle, at level 0, if it did not exist. You may use `ResourceBundle getBundle(Object associated, int level)` to create the bundle at a correct level if it did not exist. If it exists, the level value is ignored.
 
 ## XManager usage
 
