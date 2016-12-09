@@ -62,8 +62,6 @@ Note that the same parameter may be inserted more than once in the value string 
 ### Getting the bundles
 Sometimes, you will not want to use overridden values, but the one from a specific bundle. Thus to help you, you can get a bundle associated to an object using the `ResourceBundle getBundle(Object associated)`. Be careful, as this will create the corresponding bundle, at level 0, if it did not exist. You may use `ResourceBundle getBundle(Object associated, int level)` to create the bundle at a correct level if it did not exist. If it exists, the level value is ignored.
 
-## XManager usage
-
 ## XEngine usage
 The XEngine class is used to create instances of javascript scripting engines in a simple way, to set values to variables, evaluate scripts and get values from variables. It may, in the future, provide engines for other languages.
 To create a new XEngine, it is simple as calling `XEngine engine = new XEngine();`.
@@ -73,3 +71,17 @@ To put a value in a global variable in the engine, call `engine.put(String name,
 To evaluate a script, use `Object returned = engine.eval(String script);` that will evaluate the text of the script and return the value returned by the script execution. You may also use any type of Reader as an input for the evaluation : `Object returned = eval(Reader reader);`
 
 To get a value from a global variable in the engine, call `Object value = engine.get(String name);` The content of the *name* variable will be returned, if it exists at global scope.
+
+## XManager usage
+The main usage of the extension mechanism is get all (one or more) extension classes that correspond to a base class or interface definition. This may be also creating an instance of all the existing derived classes (excluding abstract ones). To achieve this, there are several method, depending on what to really do, with parameters. Of course, most of the time, if you known all the jars from the application, this is straightforward. But the mechanisme here allows you to build the application and calling methods *without knowing the implementing class* and *without any configuration file. for example : if you want to change the database type, just add the corresponding jars and a wrapper jar with an extension to your *abstract database wrapper (or interface)*. The key here is : ***no configuration when changing***.
+
+### getting the derived classes
+At first, you maybe just want to know the list of the classes implementing your base class or interface. Note that this is not required for the other methods to work. Use `List<Class<MyClass>> myClassList = XManager.loadExtensionClasses(MyClass.class, boolean allowsMultipe, boolean forceReload);`. This will give you a list of classes, all deriving from the base *MyClass* class. The parameters allows you to specify if you are waiting for only one derived class (this may be the case for a database system) or any number of elements in the list (as for a bunch of drivers). As parsing the jars for classes may be quite long, all searches are cached for speed. You may want to refresh the cache. To get only one extension without refreshing, use `Class<MyClass> myderivedClass = XManager.loadExtensionClass(MyClass.class);`.
+
+### Getting instances
+The process to get one instance of all the derived classes from the base class or interface is quite the same. The big difference is that you may need to add parameters to the *new* call to create the instances. Thus the call is `List<MyClass> myInstanceList = XManager.loadAbstractExtensions(MyClass.class, boolean forceReload, Object... arguments);`. The mechanism will search for the classes (refreshing the cache if required) and try to instantiate an instance of each one using the given arguments. Note that the arguments are the same for all creation calls.
+
+The call to get the instance of a single derived class (generating an Exception if more than one is found) is `MyClass myInstance = XManager.loadAbstractExtension(MyClass.class, boolean forceReload, Object... arguments);`. The mechanism will search for the class (refreshing the cache if required) and try to instantiate an instance of it using the given arguments.
+
+### Container extensions
+TBW 
