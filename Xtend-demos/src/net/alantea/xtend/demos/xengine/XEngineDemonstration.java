@@ -16,10 +16,10 @@ public class XEngineDemonstration
       XEngine engine = new XEngine();
       
       engine.put("myVariable", 69);
-      Integer value = 0;
+      Double value = 0.0;
       try
       {
-         value = (Integer) engine.eval("myVariable = myVariable - 27;");
+         value = (Double) engine.eval("myVariable = myVariable - 27;");
       }
       catch (Xception e)
       {
