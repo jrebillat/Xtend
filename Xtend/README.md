@@ -33,7 +33,7 @@ The best way to deal with this problem is to built an API, on top of the variabl
 
 OK, but, how to tell the application which value to return ? The answer is to level your bundles. The returned value will depend one the various levels of bundles containing the searched key.
 
-## Bonus
+## Javascript
 The start of a javascript engine encapsulation is also available in XEngine.
 
 ## XMessages usage
@@ -52,7 +52,7 @@ The base method to get values is `String get(String key, String... parameters)`,
 There are a few helpers, to get an integer : `int getInteger(String key)` that returns 0 if no value has been found, to get a double : `double getDouble(String key)` that returns 0.0 if no value has been found, and `String getOrNull(String key)` that try to find a value and returns *null* if no value has been found.
 
 ### Using parameters
-To get a parametrized value, use the `String get(String key, String... parameters)` with parameters. But for parameters to be used, the value string must provide slots to insert the parameter values in it. This is done using the `[n]` syntax, with *n* being an integer value. The matching parameter (starting at 1 being the first parameter) is in included to replace the [n] part of the string.
+To get a parametrized value, use the `String get(String key, String... parameters)` with parameters. But for parameters to be used, the value string must provide slots to insert the parameter values in it. If the values are coming from your application and do not need to be internationalized, this is done using the `[n]` syntax, with *n* being an integer value. The matching parameter (starting at 1 being the first parameter) is included to replace the [n] part of the string. If the parameter is in fact a key name that need to be internationalized (recursively using XMessages), this is done using the `{n}` syntax, with *n* being an integer value. The matching parameter (starting at 1 being the first parameter) is searched in the bundles and the found vlue is included to replace the {n} part of the string. 
 
 As an example, with the following key defined in a bundle :
 `Error.display.message = An error of type [1] occurred with messages '[2]'.` (and the same, localized, in other languages), you may call (with an error named *error* being thrown) the method like `get("", error.class.getName(), error.getLocalizedMessage();` to get a good-looking error message string.
@@ -82,6 +82,8 @@ At first, you maybe just want to know the list of the classes implementing your 
 The process to get one instance of all the derived classes from the base class or interface is quite the same. The big difference is that you may need to add parameters to the *new* call to create the instances. Thus the call is `List<MyClass> myInstanceList = XManager.loadAbstractExtensions(MyClass.class, boolean forceReload, Object... arguments);`. The mechanism will search for the classes (refreshing the cache if required) and try to instantiate an instance of each one using the given arguments. Note that the arguments are the same for all creation calls.
 
 The call to get the instance of a single derived class (generating an Exception if more than one is found) is `MyClass myInstance = XManager.loadAbstractExtension(MyClass.class, boolean forceReload, Object... arguments);`. The mechanism will search for the class (refreshing the cache if required) and try to instantiate an instance of it using the given arguments.
+
+Extensions and internationalization are closely linked : XMessages is automatically called by XManager to load an associated bundle each time it loads a new extension. You may simply put properties files along with your extensions and do not bother with it in the code.
 
 ### Container extensions
 TBW 

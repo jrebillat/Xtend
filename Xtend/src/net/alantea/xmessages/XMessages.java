@@ -261,6 +261,7 @@ public final class XMessages
         arg = "'null'";
       }
       ret = ret.replaceAll("\\[" + (i + 1) + "\\]", arg);
+      ret = ret.replaceAll("\\{" + (i + 1) + "\\}", get(arg));
     }
     return ret;
   }
@@ -308,7 +309,7 @@ public final class XMessages
         {
            return other.name.compareTo(name);
         }
-        else if (other.level > level)
+        else if (other.level < level)
         {
            return -1;
         }

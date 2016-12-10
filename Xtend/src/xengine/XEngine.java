@@ -1,10 +1,12 @@
-package net.alantea.xtend;
+package xengine;
 
 import java.io.Reader;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+
+import net.alantea.xtend.Xception;
 
 /**
  * The Class XEngine is used to simplify access to Javascript commands.
