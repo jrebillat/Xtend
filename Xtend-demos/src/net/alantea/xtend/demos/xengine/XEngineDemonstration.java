@@ -15,18 +15,48 @@ public class XEngineDemonstration
    {
       XEngine engine = new XEngine();
       
-      engine.put("myVariable", 69);
-      Double value = 0.0;
+      // setting a variable
+      engine.put("myVariable1", 69);
+      System.out.println("Put value : " + engine.get("myVariable1"));
+      
+      // running a script, getting last operation value
+      Double value1 = 0.0;
       try
       {
-         value = (Double) engine.eval("myVariable = myVariable - 27;");
+         value1 = (Double) engine.eval("myVariable1 = myVariable1 - 27;");
       }
       catch (Xception e)
       {
          // TODO Auto-generated catch block
          e.printStackTrace();
       }
-      System.out.println("Returned value is : " + value);
+      System.out.println("Returned value is : " + value1);
+      
+      // Testing working with several variables
+      engine.put("myVariable2", 666);
+      Double value2 = 0.0;
+      try
+      {
+         value2 = (Double) engine.eval("myVariable2 - myVariable1;");
+      }
+      catch (Xception e)
+      {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
+      System.out.println("Returned value is : " + value2);
+      
+      // Changing existing variable
+      try
+      {
+         engine.eval("myVariable2 = 999;");
+      }
+      catch (Xception e)
+      {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
+      System.out.println("Got value : " + engine.get("myVariable2"));
    }
 
 
