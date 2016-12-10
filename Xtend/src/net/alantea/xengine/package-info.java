@@ -4,4 +4,4 @@
  * @author Jean Rébillat
  *
  */
-package xengine;
+package net.alantea.xengine;

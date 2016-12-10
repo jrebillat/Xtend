@@ -1,7 +1,7 @@
 package net.alantea.xtend.demos.xengine;
 
+import net.alantea.xengine.XEngine;
 import net.alantea.xtend.Xception;
-import xengine.XEngine;
 
 public class XEngineDemonstration
 {

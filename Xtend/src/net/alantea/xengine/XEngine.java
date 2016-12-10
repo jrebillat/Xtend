@@ -1,4 +1,4 @@
-package xengine;
+package net.alantea.xengine;
 
 import java.io.Reader;
 
