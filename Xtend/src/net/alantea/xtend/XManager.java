@@ -4,7 +4,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 import net.alantea.xmessages.XMessages;
@@ -31,7 +33,12 @@ import net.alantea.xtend.Xception.Why;
  */
 public class XManager
 {
+   
+   /** The extensions. */
    private static List<? extends Class<?>> extensions = new ArrayList<Class<?>>();
+
+   /** The instances. */
+   private static Map<String, Object> instances = new HashMap<>();
 
    /** Private singleton constructor. */
    private XManager()
@@ -111,9 +118,10 @@ public class XManager
    /**
     * Given an object implementing IExtension, instantiate all implementations and notify the
     * object.
-    * 
+    *
     * @param extend extension for which to instantiate implementations
     * @param forcedReload to force for reflective research even if a target is found in cache
+    * @param args the args
     * @throws Xception when raised
     */
    private static void loadImplementations(IExtension extend, boolean forcedReload, Object... args) throws Xception
@@ -212,6 +220,61 @@ public class XManager
       return (Class<T>) classes.get(0);
    }
 
+   /**
+    * Gets the named instance of something.
+    *
+    * @param <T> the generic type
+    * @param reference the reference
+    * @return single instance found or null
+    */
+   @SuppressWarnings("unchecked")
+   public static <T> T getInstance(String reference)
+   {
+      return (T) instances.get(reference);
+   }
+
+   /**
+    * Sets a named instance of something.
+    *
+    * @param reference the reference
+    * @param instance the instance to save
+    */
+   public static void setInstance(String reference, Object instance)
+   {
+      instances.put(reference, instance);
+   }
+
+   /**
+    * Load an instance of something with Xtend mechanism.
+    *
+    * @param <T> the generic type
+    * @param reference the reference
+    * @param cl the base class use as extension pattern
+    * @param args the arguments to give to instance for creation
+    * @return the loaded instance
+    * @throws Xception if something went wrong
+    */
+   @SuppressWarnings("unchecked")
+   public static <T> T loadInstance(String reference, Class<?> cl, Object... args) throws Xception
+   {
+         Object object = XManager.loadAbstractExtension(cl, false, args);
+         if ((reference != null) && (object != null))
+         {
+            instances.put(reference, object);
+         }
+         return (T) object;
+   }
+
+   /**
+    * Load extension classes.
+    *
+    * @param <T> the generic type
+    * @param baseClass the base class
+    * @param acceptMultiple the accept multiple
+    * @param forcedReload the forced reload
+    * @return the list
+    * @throws Xception the xception
+    */
    @SuppressWarnings("unchecked")
    private static <T> List<Class<?>> loadExtensionClasses(Class<T> baseClass, boolean acceptMultiple,
          boolean forcedReload) throws Xception
@@ -271,6 +334,17 @@ public class XManager
       return classes;
    }
 
+   /**
+    * Load extensions.
+    *
+    * @param <T> the generic type
+    * @param baseClass the base class
+    * @param acceptMultiple the accept multiple
+    * @param forcedReload the forced reload
+    * @param args the args
+    * @return the list
+    * @throws Xception the xception
+    */
    private static <T> List<T> loadExtensions(Class<?> baseClass, boolean acceptMultiple, boolean forcedReload,
          Object... args) throws Xception
    {
