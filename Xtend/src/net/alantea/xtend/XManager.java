@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
+import net.alantea.tools.scan.Scanner;
 import net.alantea.xmessages.XMessages;
 import net.alantea.xtend.Xception.Why;
 
@@ -297,11 +297,11 @@ public class XManager
          List<String> set;
          if (baseClass.isInterface())
          {
-            set = new FastClasspathScanner().scan().getNamesOfClassesImplementing(baseClass);
+            set = Scanner.getNamesOfClassesImplementing(baseClass);
          }
          else
          {
-            set = new FastClasspathScanner().scan().getNamesOfSubclassesOf(baseClass);
+            set = Scanner.getNamesOfSubclassesOf(baseClass);
          }
 
          for (String o : set)

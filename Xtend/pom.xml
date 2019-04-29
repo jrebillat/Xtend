@@ -99,11 +99,11 @@
     </plugins>
   </build>
 	<dependencies>
-		<dependency>
-			<groupId>io.github.lukehutch</groupId>
-			<artifactId>fast-classpath-scanner</artifactId>
-			<version>2.0.6</version>
-		</dependency>
+	<dependency>
+        <groupId>net.alantea</groupId>
+        <artifactId>tools</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </dependency>
 		<dependency>
 			<groupId>org.apache.maven.shared</groupId>
 			<artifactId>maven-invoker</artifactId>
